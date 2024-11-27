@@ -1,0 +1,29 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.11'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    goals: 'verify'
+
+# Adding a conditional check for job success
+- script: |
+    echo "Verifying job status..."
+    if [ $? -eq 0 ]; then
+        echo "Build succeeded!"
+    else
+        echo "Build failed. Exiting..."
+        exit 1
+    fi
+  displayName: 'Verify Build Success'
+
